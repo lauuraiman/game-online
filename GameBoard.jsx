@@ -71,42 +71,38 @@ function GameBoard({ roomCode, playersList = [] }) {
     )
   );
 
-  const getRoomIdFromUrl = () => {
-    if (typeof window === 'undefined') {
-      return roomCode
-        ? roomCode.toUpperCase()
-        : Math.random()
-            .toString(36)
-            .substring(2, 8)
-            .toUpperCase();
-    }
-
-    const pathSegments =
-      window.location.pathname.split('/');
-
-    const lastSegment =
-      pathSegments[pathSegments.length - 1];
-
-    if (
-      lastSegment &&
-      lastSegment !== '' &&
-      lastSegment !== 'room'
-    ) {
-      return lastSegment.toUpperCase();
-    }
-
+ const getRoomIdFromUrl = () => {
+  if (typeof window === 'undefined') {
     return roomCode
       ? roomCode.toUpperCase()
       : Math.random()
           .toString(36)
           .substring(2, 8)
           .toUpperCase();
-  };
+  }
 
-  const [roomId] = useState(
-    getRoomIdFromUrl
+  const params = new URLSearchParams(
+    window.location.search
   );
 
+  const roomFromUrl =
+    params.get('room');
+
+  if (roomFromUrl) {
+    return roomFromUrl.toUpperCase();
+  }
+
+  return roomCode
+    ? roomCode.toUpperCase()
+    : Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
+};
+
+const [roomId] = useState(
+  getRoomIdFromUrl
+);
   const [copied, setCopied] = useState(false);
 
   const [activePlayerIndex, setActivePlayerIndex] =
@@ -366,35 +362,36 @@ function GameBoard({ roomCode, playersList = [] }) {
   }, [roomId]);
 
   // =========================================================
-  // КОПИРОВАНИЕ ССЫЛКИ
-  // =========================================================
+  // // =========================================================
+// КОПИРОВАНИЕ ССЫЛКИ
+// =========================================================
 
-  const copyInviteLink = async () => {
-    const inviteLink =
-      `${window.location.origin}/room/${roomId}`;
+const copyInviteLink = async () => {
+  const inviteLink =
+    `${window.location.origin}/?room=${roomId}`;
 
-    try {
-      await navigator.clipboard.writeText(
-        inviteLink
-      );
+  try {
+    await navigator.clipboard.writeText(
+      inviteLink
+    );
 
-      setCopied(true);
+    setCopied(true);
 
-      setTimeout(() => {
-        setCopied(false);
-      }, 3000);
-    } catch (error) {
-      console.error(
-        'Ошибка копирования:',
-        error
-      );
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  } catch (error) {
+    console.error(
+      'Ошибка копирования:',
+      error
+    );
 
-      window.prompt(
-        'Скопируйте ссылку:',
-        inviteLink
-      );
-    }
-  };
+    window.prompt(
+      'Скопируйте ссылку:',
+      inviteLink
+    );
+  }
+};
 
   // =========================================================
   // КУБИК
