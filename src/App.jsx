@@ -1,14 +1,29 @@
 import React, { useState } from 'react';
 import GameBoard from './components/GameBoard';
 import './App.css';
-
 export default function App() {
   const [roomCreated, setRoomCreated] = useState(false);
   const [playerCount, setPlayerCount] = useState(2);
   const [playerNames, setPlayerNames] = useState(['Игрок 1', 'Игрок 2']);
-  const [roomCode] = useState('MG-' + Math.random().toString(36).substring(2, 6).toUpperCase());
-  const [isRulesOpen, setIsRulesOpen] = useState(false);
 
+  const [roomCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roomFromUrl = params.get('room');
+
+    if (roomFromUrl) {
+      return roomFromUrl.toUpperCase();
+    }
+
+    return (
+      'MG-' +
+      Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase()
+    );
+  });
+
+  const [isRulesOpen, setIsRulesOpen] = useState(false);
   const handlePlayerCountChange = (count) => {
     setPlayerCount(count);
     const newNames = Array.from({ length: count }, (_, i) => `Игрок ${i + 1}`);
